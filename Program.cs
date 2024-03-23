@@ -7,6 +7,11 @@ namespace dotnetcore
     {
         static void Main(string[] args)
         {
+            ChestChallenge();
+        }
+
+        private static void ChestChallenge()
+        {
             ChestState state = ChestState.Open;
             ChestActions action;
             int iteration = 0;
@@ -18,8 +23,8 @@ namespace dotnetcore
                 string response = (Console.ReadLine()).ToUpper();
 
                 // Convert response to action
-                if(Enum.TryParse(response, ignoreCase: true, out ChestActions parsedAction))
-                 action = parsedAction;
+                if (Enum.TryParse(response, ignoreCase: true, out ChestActions parsedAction))
+                    action = parsedAction;
                 else
                 {
                     Console.WriteLine("That is not a valid action. Try again.");
@@ -33,20 +38,19 @@ namespace dotnetcore
                             state = ChestState.Closed;
                         break;
                     case ChestState.Closed:
-                        if(action == ChestActions.Open)
+                        if (action == ChestActions.Open)
                             state = ChestState.Open;
-                        else if(action == ChestActions.Lock)
+                        else if (action == ChestActions.Lock)
                             state = ChestState.Locked;
                         break;
                     case ChestState.Locked:
-                        if(action == ChestActions.Unlock)
-                            state  = ChestState.Closed;
+                        if (action == ChestActions.Unlock)
+                            state = ChestState.Closed;
                         break;
                 }
-  
 
                 iteration++;
-                if(iteration >= maxIteration || action == ChestActions.Exit)
+                if (iteration >= maxIteration || action == ChestActions.Exit)
                     break;
 
             }
