@@ -145,6 +145,11 @@ namespace dotnetcore
             }
         }
 
+        private static void ArrowChallenge()
+        {
+
+        }
+
         private static string GetEnumAsString(Type enumType)
         {
             Array enumValues = Enum.GetValues(enumType);
@@ -188,6 +193,72 @@ namespace dotnetcore
                     continue;
                 }
             }
+        }
+
+
+        class Arrow
+        {
+            (ArrowHeadMaterials arrowHeadMaterial, float arrowHeadCost) _arrowHead;
+            (FletchingMaterials fletchingMaterial, float fletchingCost) _fletching;
+            (float shaftLength, float shaftLengthCostPerCM) _shaft;
+
+            public Arrow() : this(ArrowHeadMaterials.Steel, FletchingMaterials.Plastic, 45f)
+            { }
+
+            public Arrow(ArrowHeadMaterials arrowHeadMaterial, FletchingMaterials fletchingMaterial, float shaftLength)
+            {
+                _arrowHead.arrowHeadMaterial = ArrowHeadMaterials.Steel;
+                _arrowHead.arrowHeadCost = SetArrowHeadCost(_arrowHead.arrowHeadMaterial);
+
+                _fletching.fletchingMaterial = FletchingMaterials.Plastic;
+                _fletching.fletchingCost = SetFletchingCost(_fletching.fletchingMaterial);
+
+                _shaft.shaftLength = shaftLength;
+                _shaft.shaftLengthCostPerCM = 0.05f;
+
+            }
+
+            public float SetArrowHeadCost(ArrowHeadMaterials arrowHeadMaterial)
+            {
+                return arrowHeadMaterial switch
+                {
+                    ArrowHeadMaterials.Steel => 10f,
+                    ArrowHeadMaterials.Wood => 3f,
+                    ArrowHeadMaterials.Obsidian => 5f,
+                    _ => throw new ArgumentOutOfRangeException(nameof(arrowHeadMaterial), arrowHeadMaterial, "Invalid arrow head material.")
+                };
+            }
+
+            public float SetFletchingCost(FletchingMaterials fletchingMaterial)
+            {
+                return fletchingMaterial switch
+                {
+                    FletchingMaterials.Plastic => 10f,
+                    FletchingMaterials.Turkey_Feather => 5f,
+                    FletchingMaterials.Goose_Feather => 3f,
+                    _ => throw new ArgumentOutOfRangeException(nameof(fletchingMaterial), fletchingMaterial, "Invalid fletching material.")
+                };
+            }
+
+
+            public float ArrowCost()
+            {
+                return _arrowHead.arrowHeadCost + _fletching.fletchingCost + _shaft.shaftLength * _shaft.shaftLengthCostPerCM;
+            }
+        }
+
+        enum ArrowHeadMaterials
+        {
+            Steel,
+            Wood,
+            Obsidian
+        }
+
+        enum FletchingMaterials
+        {
+            Plastic,
+            Turkey_Feather,
+            Goose_Feather
         }
 
         enum ChestState
