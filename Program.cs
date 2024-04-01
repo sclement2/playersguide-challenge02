@@ -153,10 +153,22 @@ namespace dotnetcore
             int shaftLength = GetIntInputFromRange(10, 60, "shaft length");
             Arrow arrow = new Arrow(arrowHeadMaterial, fletchingMaterial, shaftLength);
 
+            Console.WriteLine("Arrow head material: " + arrow.ArrowHeadMaterial);
+            Console.WriteLine("Fletching material: " + arrow.FletchingMaterial);
+            Console.WriteLine("Shaft length: " + arrow.ShaftLength);
+            Console.WriteLine();
+
             arrow.GetArrowDescription();
             Console.WriteLine($"The cost of the arrow is {arrow.GetArrowCost()}");
         }
 
+        /// <summary>
+        /// Get the integer input from the user. If the user does not provide a valid input, the program will choose a random value.
+        /// </summary>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <param name="message"></param>
+        /// <returns>Integer entered by user</returns>
         private static int GetIntInputFromRange(int min, int max, string message)
         {
             int maxTries = 2;
@@ -170,19 +182,9 @@ namespace dotnetcore
                     {
                         return response;
                     }
-                    else
-                    {
-                        Console.WriteLine("Sorry, that's not a valid input");
-                        count++;
-                        continue;
-                    }
                 }
-                else
-                {
-                    Console.WriteLine("Sorry, that's not a valid input");
-                    count++;
-                    continue;
-                }
+                Console.WriteLine("Sorry, that's not a valid input");
+                count++;
             }
             Console.WriteLine("Let me choose a value for you.");
             int randomNumber = 45;
@@ -190,6 +192,11 @@ namespace dotnetcore
             return randomNumber;
         }
 
+        /// <summary>
+        /// Get the enum values as a string.
+        /// </summary>
+        /// <param name="enumType"></param>
+        /// <returns>Enum as a string</returns>
         private static string GetEnumAsString(Type enumType)
         {
             Array enumValues = Enum.GetValues(enumType);
@@ -202,12 +209,18 @@ namespace dotnetcore
             return enumString;
         }
 
+        /// <summary>
+        /// Get the enum selection from the user. If the user does not provide a valid input, the program will choose a random value.
+        /// </summary>
+        /// <typeparam name="TEnum"></typeparam>
+        /// <param name="attributeName"></param>
+        /// <returns>User selected enum value</returns>
         private static TEnum GetEnumSelection<TEnum>(string attributeName) where TEnum : struct, Enum
         {
-            int tries = 1;
+            int tries = 0;
             int maxTries = 2;
             int randomIndex = 0;
-            while (true)
+            while (tries < maxTries)
             {
                 Console.WriteLine($"\nTell me what {attributeName} you would like. ");
                 Console.Write("Your choices are as follows: ");
@@ -218,30 +231,23 @@ namespace dotnetcore
                 {
                     return parsedValue;
                 }
-                else if (tries > maxTries)
-                {
-                    Array enumValues = Enum.GetValues(typeof(TEnum));
-                    Console.WriteLine($"OK, this does not seem to be working. I will choose a {attributeName} for you.");
-                    TEnum randomChoice = (TEnum)enumValues.GetValue(randomIndex);
-                    Console.WriteLine($"Your {attributeName} is {randomChoice}");
-                    return randomChoice;
-                }
-                else
-                {
-                    Console.WriteLine("Sorry, that's not a valid option. Let's try this again.");
-                    tries++;
-                    continue;
-                }
+                Console.WriteLine("Sorry, that's not a valid option. Let's try this again.");
+                tries++;
+                continue;
             }
+            Array enumValues = Enum.GetValues(typeof(TEnum));
+            Console.WriteLine($"OK, this does not seem to be working. I will choose a {attributeName} for you.");
+            TEnum randomChoice = (TEnum)enumValues.GetValue(randomIndex);
+            Console.WriteLine($"Your {attributeName} is {randomChoice}");
+            return randomChoice;
         }
-
 
         class Arrow
         {
             // Tuples for the arrowhead, fletching and shaft. Idea is to capture the material and cost of each component.
-            (ArrowHeadMaterials arrowHeadMaterial, float arrowHeadCost) _arrowHead;
-            (FletchingMaterials fletchingMaterial, float fletchingCost) _fletching;
-            (int shaftLength, float shaftLengthCostPerCM) _shaft;
+            private (ArrowHeadMaterials arrowHeadMaterial, float arrowHeadCost) _arrowHead;
+            private (FletchingMaterials fletchingMaterial, float fletchingCost) _fletching;
+            private (int shaftLength, float shaftLengthCostPerCM) _shaft;
 
             // Default constructor. Sets the default values for the arrowhead, fletching and shaft.
             public Arrow() : this(ArrowHeadMaterials.Steel, FletchingMaterials.Plastic, 45)
@@ -260,9 +266,24 @@ namespace dotnetcore
                 _shaft.shaftLengthCostPerCM = 0.05f;
 
             }
+            // Getters for the arrowhead, fletching and shaft.
+            public ArrowHeadMaterials ArrowHeadMaterial
+            {
+                get => _arrowHead.arrowHeadMaterial;
+            }
+
+            public FletchingMaterials FletchingMaterial
+            {
+                get => _fletching.fletchingMaterial;
+            }
+
+            public int ShaftLength
+            {
+                get => _shaft.shaftLength;
+            }
 
             // Set the cost of the arrowhead based on the material.
-            public float SetArrowHeadCost(ArrowHeadMaterials arrowHeadMaterial)
+            private float SetArrowHeadCost(ArrowHeadMaterials arrowHeadMaterial)
             {
                 return arrowHeadMaterial switch
                 {
@@ -274,7 +295,7 @@ namespace dotnetcore
             }
 
             // Set the cost of the fletching based on the material.
-            public float SetFletchingCost(FletchingMaterials fletchingMaterial)
+            private float SetFletchingCost(FletchingMaterials fletchingMaterial)
             {
                 return fletchingMaterial switch
                 {
@@ -291,9 +312,10 @@ namespace dotnetcore
                 return _arrowHead.arrowHeadCost + _fletching.fletchingCost + _shaft.shaftLength * _shaft.shaftLengthCostPerCM;
             }
 
+            // Get the description of the arrow.
             public void GetArrowDescription()
             {
-                Console.WriteLine($"The arrow is constructed as follows:\n{(_arrowHead.arrowHeadMaterial)} arrowhead\n{_fletching.fletchingMaterial} fletching\n{_shaft.shaftLength} cm shaft.");
+                Console.WriteLine($"\nThe arrow is constructed as follows:\n{(_arrowHead.arrowHeadMaterial)} arrowhead\n{_fletching.fletchingMaterial} fletching\n{_shaft.shaftLength} cm shaft.");
             }
         }
 
