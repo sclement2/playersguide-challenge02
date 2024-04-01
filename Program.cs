@@ -7,7 +7,8 @@ namespace dotnetcore
         static void Main(string[] args)
         {
             //ChestChallenge();
-            SoupChallenge();
+            //SoupChallenge();
+            ArrowChallenge();
         }
 
         // Simula's Test Challenge
@@ -147,7 +148,46 @@ namespace dotnetcore
 
         private static void ArrowChallenge()
         {
+            ArrowHeadMaterials arrowHeadMaterial = GetEnumSelection<ArrowHeadMaterials>("arrowhead material");
+            FletchingMaterials fletchingMaterial = GetEnumSelection<FletchingMaterials>("fletching material");
+            int shaftLength = GetIntInputFromRange(10, 60, "shaft length");
+            Arrow arrow = new Arrow(arrowHeadMaterial, fletchingMaterial, shaftLength);
 
+            arrow.GetArrowDescription();
+            Console.WriteLine($"The cost of the arrow is {arrow.GetArrowCost()}");
+        }
+
+        private static int GetIntInputFromRange(int min, int max, string message)
+        {
+            int maxTries = 2;
+            int count = 0;
+            while (count < maxTries)
+            {
+                Console.Write($"\nProvide a number for the {message}. The number should be in between {min} and {max}. ");
+                if (int.TryParse(Console.ReadLine(), out int response))
+                {
+                    if (response <= max && response >= min)
+                    {
+                        return response;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Sorry, that's not a valid input");
+                        count++;
+                        continue;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Sorry, that's not a valid input");
+                    count++;
+                    continue;
+                }
+            }
+            Console.WriteLine("Let me choose a value for you.");
+            int randomNumber = 45;
+            Console.Write($"The {message} is {randomNumber}.\n");
+            return randomNumber;
         }
 
         private static string GetEnumAsString(Type enumType)
@@ -198,19 +238,22 @@ namespace dotnetcore
 
         class Arrow
         {
+            // Tuples for the arrowhead, fletching and shaft. Idea is to capture the material and cost of each component.
             (ArrowHeadMaterials arrowHeadMaterial, float arrowHeadCost) _arrowHead;
             (FletchingMaterials fletchingMaterial, float fletchingCost) _fletching;
-            (float shaftLength, float shaftLengthCostPerCM) _shaft;
+            (int shaftLength, float shaftLengthCostPerCM) _shaft;
 
-            public Arrow() : this(ArrowHeadMaterials.Steel, FletchingMaterials.Plastic, 45f)
+            // Default constructor. Sets the default values for the arrowhead, fletching and shaft.
+            public Arrow() : this(ArrowHeadMaterials.Steel, FletchingMaterials.Plastic, 45)
             { }
 
-            public Arrow(ArrowHeadMaterials arrowHeadMaterial, FletchingMaterials fletchingMaterial, float shaftLength)
+            // Constructor with parameters to set the arrowhead, fletching and shaft.
+            public Arrow(ArrowHeadMaterials arrowHeadMaterial, FletchingMaterials fletchingMaterial, int shaftLength)
             {
-                _arrowHead.arrowHeadMaterial = ArrowHeadMaterials.Steel;
+                _arrowHead.arrowHeadMaterial = arrowHeadMaterial;
                 _arrowHead.arrowHeadCost = SetArrowHeadCost(_arrowHead.arrowHeadMaterial);
 
-                _fletching.fletchingMaterial = FletchingMaterials.Plastic;
+                _fletching.fletchingMaterial = fletchingMaterial;
                 _fletching.fletchingCost = SetFletchingCost(_fletching.fletchingMaterial);
 
                 _shaft.shaftLength = shaftLength;
@@ -218,6 +261,7 @@ namespace dotnetcore
 
             }
 
+            // Set the cost of the arrowhead based on the material.
             public float SetArrowHeadCost(ArrowHeadMaterials arrowHeadMaterial)
             {
                 return arrowHeadMaterial switch
@@ -229,6 +273,7 @@ namespace dotnetcore
                 };
             }
 
+            // Set the cost of the fletching based on the material.
             public float SetFletchingCost(FletchingMaterials fletchingMaterial)
             {
                 return fletchingMaterial switch
@@ -240,10 +285,15 @@ namespace dotnetcore
                 };
             }
 
-
-            public float ArrowCost()
+            // Calculate the cost of the arrow based on the cost of the arrowhead, fletching and shaft.
+            public float GetArrowCost()
             {
                 return _arrowHead.arrowHeadCost + _fletching.fletchingCost + _shaft.shaftLength * _shaft.shaftLengthCostPerCM;
+            }
+
+            public void GetArrowDescription()
+            {
+                Console.WriteLine($"The arrow is constructed as follows:\n{(_arrowHead.arrowHeadMaterial)} arrowhead\n{_fletching.fletchingMaterial} fletching\n{_shaft.shaftLength} cm shaft.");
             }
         }
 
